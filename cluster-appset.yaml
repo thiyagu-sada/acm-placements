@@ -1,0 +1,32 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: clusters-quarkus-appset
+  namespace: openshift-gitops
+spec:
+  generators:
+    - clusterDecisionResource:
+        configMapRef: acm-placement
+        labelSelector:
+          matchLabels:
+            cluster.open-cluster-management.io/placement: all-clusters-placement
+  template:
+    metadata:
+      name: "{{name}}-all-quarkus-appset"
+    spec:
+      destination:
+        server: "{{server}}"
+        namespace: quarkus-demo
+      project: default
+      source:
+        path: quarkus-app
+        repoURL: https://github.com/thiyagu-sada/ocp-acm-apps.git
+        targetRevision: main
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+
